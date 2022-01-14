@@ -1,0 +1,23 @@
+{
+  "name": "qaa",
+  "version": "1.0.0",
+  "description": "system design capstone - qaa",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TeamGenesect-SDC/QAA.git"
+  },
+  "author": "Marc Lawson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TeamGenesect-SDC/QAA/issues"
+  },
+  "homepage": "https://github.com/TeamGenesect-SDC/QAA#readme",
+  "dependencies": {
+    "express": "^4.17.2",
+    "pg": "^8.7.1"
+  }
+}

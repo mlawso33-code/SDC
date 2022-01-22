@@ -5,12 +5,10 @@ CREATE DATABASE qaa_db;
 \c qaa_db
 
 --schema create
--- DROP SCHEMA IF EXISTS qaa;
--- CREATE SCHEMA qaa;
 
 -- products
   CREATE TABLE products (
-    id INT,
+    id SERIAL,
     name TEXT,
     slogan TEXT,
     description TEXT,
@@ -18,11 +16,11 @@ CREATE DATABASE qaa_db;
     price INT,
     PRIMARY KEY(id)
   );
-  --ALTER TABLE products ADD CONSTRAINT products_pkey PRIMARY KEY (id);
+
 
 -- questions
   CREATE TABLE questions (
-    id INT,
+    id SERIAL,
     product_id INT,
     body TEXT,
     date_written BIGINT,
@@ -34,11 +32,11 @@ CREATE DATABASE qaa_db;
     FOREIGN KEY(product_id)
       REFERENCES products(id)
   );
-  --ALTER TABLE questions ADD CONSTRAINT questions_pkey PRIMARY KEY(id);
+
 
 -- answers
   CREATE TABLE answers (
-    id INT,
+    id SERIAL,
     question_id INT,
     body TEXT,
     date_written BIGINT,
@@ -50,49 +48,88 @@ CREATE DATABASE qaa_db;
     FOREIGN KEY (question_id)
       REFERENCES questions(id)
   );
-  --SELECT to_timestamp(date_written);
-  --ALTER TABLE answers ADD CONSTRAINT answers_pkey PRIMARY KEY (id);
+
 
 -- photos
   CREATE TABLE photos (
-    id INT,
+    id SERIAL,
     answer_id INT,
     url TEXT,
     PRIMARY KEY(id),
     FOREIGN KEY (answer_id)
       REFERENCES answers(id)
   );
-  --ALTER TABLE photos ADD CONSTRAINT photos_pkey PRIMARY KEY (id);
-
--- foreign keys
 
 
-  -- {
-  --   "product_id": "44388",
-  --   "results": [
-  --       {
-  --           "question_id": 543166,
-  --           "question_body": "Is this a center for ants?!",
-  --           "question_date": "2021-11-06T00:00:00.000Z",
-  --           "asker_name": "Derek Z.",
-  --           "question_helpfulness": 1070,
-  --           "reported": false,
-  --           "answers": {
-  --               "5087574": {
-  --                   "id": 5087574,
-  --                   "body": "No, it's a center for kids that can't read good.",
-  --                   "date": "2021-11-06T00:00:00.000Z",
-  --                   "answerer_name": "Mugatu",
-  --                   "helpfulness": 54,
-  --                   "photos": []
-  --                 },
-  --               ......
-  --             }
-  --       }
-  --       .....
-  -- }
+--have to do in order
+COPY products(id, name, slogan, description, category, price)
+FROM '/Users/marclawson/hackreactor/qaa/database/product.csv'
+DELIMITER ','
+CSV HEADER;
 
---   COPY persons(first_name, last_name, dob, email)
--- FROM 'C:\sampledb\persons.csv'
+COPY questions(id, product_id, body, date_written, asker_name, asker_email, reported, helpful)
+FROM '/Users/marclawson/hackreactor/qaa/database/questions.csv'
+DELIMITER ','
+CSV HEADER;
+
+
+COPY answers(id, question_id, body, date_written, answerer_name, answerer_email, reported, helpfulness)
+FROM '/Users/marclawson/hackreactor/qaa/database/answers.csv'
+DELIMITER ','
+CSV HEADER;
+
+
+COPY photos(id, answer_id, url)
+FROM '/Users/marclawson/hackreactor/qaa/database/answers_photos.csv'
+DELIMITER ','
+CSV HEADER;
+
+CREATE INDEX questions_id_index on questions(product_id);
+CREATE INDEX answers_id_index on answers(question_id);
+CREATE INDEX photo_id_index on photos(answer_id);
+
+                            ^
+-- qaa_db=# SELECT MAX(id) FROM questions;
+--    max
+-- ---------
+--  3518963
+-- (1 row)
+-- qaa_db=# SELECT nextval('questions_id_seq');
+--  nextval
+-- ---------
+--        1
+-- (1 row)
+-- qaa_db=# SELECT pg_catalog.setval(pg_get_serial_sequence('questions', 'id'), (SELECT MAX(id) FROM questions)+1);
+--  setval
+-- ---------
+--  3518964
+-- (1 row)
+
+-- qaa_db=# SELECT nextval('questions_id_seq');
+--  nextval
+-- ---------
+--  3518965
+-- (1 row)
+
+--aws copy
+-- COPY products(id, name, slogan, description, category, price)
+-- FROM '/home/ubuntu/product.csv'
+-- DELIMITER ','
+-- CSV HEADER;
+
+-- COPY questions(id, product_id, body, date_written, asker_name, asker_email, reported, helpful)
+-- FROM '/home/ubuntu/questions.csv'
+-- DELIMITER ','
+-- CSV HEADER;
+
+
+-- COPY answers(id, question_id, body, date_written, answerer_name, answerer_email, reported, helpfulness)
+-- FROM '/home/ubuntu/answers.csv'
+-- DELIMITER ','
+-- CSV HEADER;
+
+
+-- COPY photos(id, answer_id, url)
+-- FROM '/home/ubuntu/answers_photos.csv'
 -- DELIMITER ','
 -- CSV HEADER;
